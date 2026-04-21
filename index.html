@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Commande de pseudo</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700&family=Space+Mono&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0e1a;
+      color: #e2e8f0;
+      font-family: 'Syne', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-image: radial-gradient(ellipse at 20% 50%, #1a1f3a 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 20%, #0f2a1a 0%, transparent 50%);
+    }
+
+    .box {
+      background: #111827;
+      border: 1px solid #1f2d40;
+      padding: 36px 32px;
+      border-radius: 16px;
+      width: 360px;
+      box-shadow: 0 0 40px rgba(34, 197, 94, 0.05);
+    }
+
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #f8fafc;
+    }
+
+    .subtitle {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin-bottom: 28px;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .step {
+      display: none;
+    }
+    .step.active {
+      display: block;
+    }
+
+    label {
+      display: block;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-family: 'Space Mono', monospace;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px 14px;
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-size: 0.95rem;
+      font-family: 'Space Mono', monospace;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #22c55e;
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #22c55e;
+      color: #0a0e1a;
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: 'Syne', sans-serif;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 4px;
+    }
+
+    .btn:hover { background: #16a34a; }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { background: #1e293b; color: #475569; cursor: not-allowed; }
+
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid #1e293b;
+      color: #64748b;
+      margin-top: 10px;
+      font-size: 0.8rem;
+    }
+    .btn-secondary:hover { border-color: #22c55e; color: #22c55e; background: transparent; }
+
+    .msg {
+      margin-top: 14px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-family: 'Space Mono', monospace;
+      display: none;
+    }
+    .msg.error { background: #1c0a0a; border: 1px solid #7f1d1d; color: #fca5a5; display: block; }
+    .msg.success { background: #0a1c0f; border: 1px solid #14532d; color: #86efac; display: block; }
+    .msg.info { background: #0c1a2e; border: 1px solid #1e3a5f; color: #93c5fd; display: block; }
+
+    .step-indicator {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 24px;
+    }
+    .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: #1e293b;
+      transition: background 0.3s;
+    }
+    .dot.active { background: #22c55e; }
+    .dot.done { background: #166534; }
+
+    .code-hint {
+      font-size: 0.75rem;
+      color: #475569;
+      margin-top: 8px;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .success-screen {
+      text-align: center;
+      padding: 10px 0;
+    }
+    .success-screen .icon { font-size: 2.5rem; margin-bottom: 14px; }
+    .success-screen p { color: #86efac; font-size: 0.9rem; font-family: 'Space Mono', monospace; }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h2>Commande de pseudo</h2>
+  <p class="subtitle">Vérification Discord requise</p>
+
+  <div class="step-indicator">
+    <div class="dot active" id="dot1"></div>
+    <div class="dot" id="dot2"></div>
+    <div class="dot" id="dot3"></div>
+  </div>
+
+  <!-- ÉTAPE 1 : ID Discord -->
+  <div class="step active" id="step1">
+    <div class="input-group">
+      <label>Ton ID Discord</label>
+      <input type="text" id="discordId" placeholder="ex: 123456789012345678">
+      <p class="code-hint">Paramètres → Avancés → Active "Mode développeur" → Fais clic droit sur ton profil → Copier l'identifiant</p>
+    </div>
+    <button class="btn" onclick="sendCode()">Recevoir mon code par DM</button>
+    <div class="msg" id="msg1"></div>
+  </div>
+
+  <!-- ÉTAPE 2 : Code de vérification -->
+  <div class="step" id="step2">
+    <div class="input-group">
+      <label>Code reçu par DM</label>
+      <input type="text" id="verifyCode" placeholder="ex: A3F9C2" maxlength="6" style="text-transform:uppercase; letter-spacing: 0.2em; font-size: 1.2rem; text-align: center;">
+      <p class="code-hint">Vérifie tes messages privés du bot Discord</p>
+    </div>
+    <button class="btn" onclick="verifyCode()">Vérifier le code</button>
+    <button class="btn btn-secondary" onclick="backToStep1()">← Changer d'ID</button>
+    <div class="msg" id="msg2"></div>
+  </div>
+
+  <!-- ÉTAPE 3 : Pseudo souhaité -->
+  <div class="step" id="step3">
+    <div class="input-group">
+      <label>Pseudo souhaité</label>
+      <input type="text" id="pseudo" placeholder="Entrez le pseudo voulu">
+    </div>
+    <button class="btn" onclick="submitPseudo()">Envoyer la demande</button>
+    <div class="msg" id="msg3"></div>
+  </div>
+
+  <!-- ÉTAPE 4 : Succès -->
+  <div class="step" id="step4">
+    <div class="success-screen">
+      <div class="icon">✅</div>
+      <p>Demande envoyée avec succès !<br><br>Tu seras contacté sur Discord.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Change cette URL si ton backend tourne ailleurs
+  const BACKEND = "http://localhost:3000";
+
+  let verifiedDiscordId = null;
+
+  function showMsg(id, text, type) {
+    const el = document.getElementById(id);
+    el.textContent = text;
+    el.className = "msg " + type;
+  }
+
+  function setStep(n) {
+    document.querySelectorAll(".step").forEach(s => s.classList.remove("active"));
+    document.getElementById("step" + n).classList.add("active");
+
+    // Dots
+    for (let i = 1; i <= 3; i++) {
+      const dot = document.getElementById("dot" + i);
+      dot.className = "dot" + (i < n ? " done" : i === n ? " active" : "");
+    }
+  }
+
+  async function sendCode() {
+    const discordId = document.getElementById("discordId").value.trim();
+    const btn = document.querySelector("#step1 .btn");
+
+    if (!discordId) return showMsg("msg1", "Entre ton ID Discord.", "error");
+
+    btn.disabled = true;
+    btn.textContent = "Envoi en cours...";
+    showMsg("msg1", "Envoi du code...", "info");
+
+    try {
+      const res = await fetch(`${BACKEND}/send-code`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ discordId })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        verifiedDiscordId = discordId;
+        setStep(2);
+      } else {
+        showMsg("msg1", data.error, "error");
+      }
+    } catch {
+      showMsg("msg1", "Impossible de contacter le serveur. Est-il lancé ?", "error");
+    }
+
+    btn.disabled = false;
+    btn.textContent = "Recevoir mon code par DM";
+  }
+
+  async function verifyCode() {
+    const code = document.getElementById("verifyCode").value.trim();
+    const btn = document.querySelector("#step2 .btn");
+
+    if (!code) return showMsg("msg2", "Entre le code reçu par DM.", "error");
+
+    btn.disabled = true;
+    btn.textContent = "Vérification...";
+
+    // On stocke temporairement l'ID et le code pour l'étape suivante
+    window._pendingCode = code;
+    setStep(3);
+
+    btn.disabled = false;
+    btn.textContent = "Vérifier le code";
+  }
+
+  async function submitPseudo() {
+    const pseudo = document.getElementById("pseudo").value.trim();
+    const btn = document.querySelector("#step3 .btn");
+
+    if (!pseudo) return showMsg("msg3", "Entre le pseudo souhaité.", "error");
+
+    btn.disabled = true;
+    btn.textContent = "Envoi...";
+
+    try {
+      const res = await fetch(`${BACKEND}/verify-and-submit`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          discordId: verifiedDiscordId,
+          code: window._pendingCode,
+          pseudo
+        })
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        setStep(4);
+      } else {
+        showMsg("msg3", data.error, "error");
+      }
+    } catch {
+      showMsg("msg3", "Impossible de contacter le serveur.", "error");
+    }
+
+    btn.disabled = false;
+    btn.textContent = "Envoyer la demande";
+  }
+
+  function backToStep1() {
+    verifiedDiscordId = null;
+    setStep(1);
+  }
+</script>
+
+</body>
+</html>
